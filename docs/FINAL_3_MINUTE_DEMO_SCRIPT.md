@@ -1,0 +1,17 @@
+# Final 3-Minute Live Jury Demo Script
+
+**Project**: Data Science Workforce Intelligence  
+**Team**: The Processors  
+**Event**: SAS CU Hackathon  
+**Target Duration**: 180 Seconds (3 Minutes)  
+
+---
+
+| Time | View / Screen | Presenter Action | Spoken Script | Expected Result / Screen State | Backup Action |
+| :---: | :--- | :--- | :--- | :--- | :--- |
+| **0:00 - 0:20** | `Dashboard Overview` | Open dashboard landing page. | *"Good morning judges. We are Team The Processors, presenting Data Science Workforce Intelligence. Strategic workforce planning requires connecting market demand, skill standards, early-career progression, and senior professional success."* | High-level metrics header and active navigation bar visible. | Use static overview screenshot if page reload lags. |
+| **0:20 - 0:45** | `Dataset Architecture` | Hover over architecture & dataset cards. | *"Our foundation synthesizes four complementary evidence layers: 1,602 Data Science job postings, 15,840 Analytics job postings, 139 junior competency traits, and 161 senior personality profiles—totaling 17,442 usable market postings with 99.99% retention. Crucially, we deliberately do NOT row-wise merge these datasets because they describe distinct entities."* | Dataset provenance summary cards highlighted. | Point to dataset table in README. |
+| **0:45 - 1:15** | `Model Lab` | Navigate to `/models`. Run SDS prediction. | *"Our primary model evaluates senior professional success using Big Five personality traits ($N=161$). A Random Forest classifier achieves a cross-validated ROC-AUC of $0.9928 \pm 0.0048$, backed by Grouped-ID ($0.9927$) and 50-fold Repeated CV ($0.9957$) sensitivity checks. Conscientiousness ($d=+2.05$) is the strongest positive predictor, while Neuroticism ($d=-1.97$) is negative."* | Model Lab probability score ($92\%$) and feature importance chart displayed. | Pre-calculated model metrics card. |
+| **1:15 - 1:55** | `Career AI` | Navigate to `/career-ai`. Parse Jane Doe's resume. | *"In Career AI, we turn market intelligence into actionable career navigation. Uploading candidate Jane Doe's resume extracts 8 canonical skills, context evidence levels, and proficiency. Comparing her profile against Senior Data Scientist demands reveals a 78% role alignment, highlighting explicit core skill gaps in PyTorch and MLops."* | Candidate skill matrix and 78% role alignment score rendered. | Pre-loaded Jane Doe sample profile. |
+| **1:55 - 2:25** | `Roadmap & Copilot` | Adjust weekly hours slider to 25h. Ask Copilot question. | *"Our adaptive roadmap adjusts milestone durations based on weekly availability (e.g., 25h/week). Asking our Career Copilot 'What project builds PyTorch skills?' returns grounded project recommendations. Asking an out-of-scope question triggers our strict evidence guardrail: 'Insufficient evidence in available project datasets.'"* | Dynamic roadmap recalculates; Copilot returns structured JSON response with disclaimers. | Pre-generated roadmap fallback view. |
+| **2:25 - 3:00** | `Jury Mode / Conclusion` | Navigate to `/jury` or `/workforce`. | *"Every insight is explicitly framed: 'ANALYTICAL ESTIMATE — NOT A HIRING SCORE'. We intentionally restrict the personality model from automated hiring or rejection. We have built a complete, grounded workforce intelligence system connecting Market → Skills → Junior Career → Senior Success → Workforce Strategy. Thank you!"* | Responsible AI disclaimers and Workforce Strategy summary card visible. | Conclude on Workforce Strategy dashboard. |
