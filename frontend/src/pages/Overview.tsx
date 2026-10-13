@@ -13,7 +13,8 @@ import {
   Compass, 
   ArrowRight,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  AlertTriangle
 } from 'lucide-react';
 import { TabType } from '../types';
 
@@ -24,46 +25,74 @@ interface OverviewProps {
 export const Overview: React.FC<OverviewProps> = ({ onNavigate }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadOverview = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [audit, market, skills, seniorModel, workforceCards, narrative] = await Promise.all([
+        api.getAudit(),
+        api.getMarketSummary(),
+        api.getSkillsSummary(),
+        api.getSeniorModel(),
+        api.getWorkforceCards(),
+        api.getWorkforceNarrative()
+      ]);
+
+      const totalRecords = Object.values(audit).reduce((acc: number, curr: any) => acc + curr.row_count, 0);
+
+      setData({
+        datasetsCount: Object.keys(audit).length,
+        totalRecords,
+        market,
+        skills,
+        seniorModel,
+        workforceCards,
+        narrative
+      });
+    } catch (err: any) {
+      console.error('Failed to load overview data:', err);
+      setError(err?.message || 'Unable to connect to FastAPI backend at http://127.0.0.1:8000');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadOverview() {
-      try {
-        const [audit, market, skills, seniorModel, workforceCards, narrative] = await Promise.all([
-          api.getAudit(),
-          api.getMarketSummary(),
-          api.getSkillsSummary(),
-          api.getSeniorModel(),
-          api.getWorkforceCards(),
-          api.getWorkforceNarrative()
-        ]);
-
-        const totalRecords = Object.values(audit).reduce((acc: number, curr: any) => acc + curr.row_count, 0);
-
-        setData({
-          datasetsCount: Object.keys(audit).length,
-          totalRecords,
-          market,
-          skills,
-          seniorModel,
-          workforceCards,
-          narrative
-        });
-      } catch (err) {
-        console.error('Failed to load overview data:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadOverview();
   }, []);
 
-  if (loading || !data) {
+  if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-3 text-blue-400 font-mono text-sm">
           <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           Initializing Executive Workforce Command Center...
         </div>
+      </div>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <div className="max-w-xl mx-auto my-12 p-6 rounded-2xl bg-slate-900 border border-amber-500/30 text-center space-y-4">
+        <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-white">Backend Connection Notice</h3>
+        <p className="text-xs text-slate-400 font-mono leading-relaxed">
+          {error}
+        </p>
+        <p className="text-xs text-slate-500">
+          If you just launched <span className="text-slate-300 font-mono">run_demo.bat</span>, the analytical backend may take 5–10 seconds to train the models and ingest all 4 datasets.
+        </p>
+        <button
+          onClick={loadOverview}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold font-mono transition-colors shadow-lg shadow-blue-500/20"
+        >
+          Retry Connection
+        </button>
       </div>
     );
   }

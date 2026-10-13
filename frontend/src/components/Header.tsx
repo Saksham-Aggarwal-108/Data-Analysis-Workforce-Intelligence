@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { BrainCircuit, Layers, Download, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BrainCircuit, Layers, Download, HelpCircle, AlertCircle } from 'lucide-react';
 import { MethodologyModal } from './MethodologyModal';
+import { api } from '../api';
 
 interface HeaderProps {
   onExportMetadata: () => void;
@@ -8,6 +9,25 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onExportMetadata }) => {
   const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkHealth = async () => {
+      try {
+        await api.getHealth();
+        if (isMounted) setIsOnline(true);
+      } catch (err) {
+        if (isMounted) setIsOnline(false);
+      }
+    };
+    checkHealth();
+    const interval = setInterval(checkHealth, 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <>
@@ -44,10 +64,22 @@ export const Header: React.FC<HeaderProps> = ({ onExportMetadata }) => {
               View Methodology
             </button>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Pipeline Active (4 Datasets)
-            </div>
+            {isOnline === true ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                API Connected (127.0.0.1:8000)
+              </div>
+            ) : isOnline === false ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-mono" title="Backend not reachable at http://127.0.0.1:8000">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                Backend Offline (Retrying...)
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-400 rounded-lg text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+                Checking Connection...
+              </div>
+            )}
 
             <button
               onClick={onExportMetadata}
